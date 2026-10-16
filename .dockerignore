@@ -9,6 +9,5 @@ node_modules
 *.md
 .env
 .env.*
-deploy
 .DS_Store
 **/vite.config.ts.timestamp-*

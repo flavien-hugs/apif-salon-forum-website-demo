@@ -46,9 +46,11 @@ packages/
     src/utils               validation
 docker/nginx.conf           configuration nginx commune aux deux images
 Dockerfile                  multi-stage, paramétré par --build-arg APP=<app>
-deploy/                     docker-compose.yml (2 services), .env.example, deploy.sh
 .github/workflows/ci.yml    qualité + build + image + déploiement, par application
 ```
+
+Le déploiement serveur (compose, variables, script) vit sur la branche `deploy`, seule
+branche clonée sur le serveur : voir sa section plus bas.
 
 Ce qui est propre à un site (navigation, données, pages, textes) reste dans son
 application ; ce qui est identique dans les deux maquettes (design system, champs,
@@ -101,32 +103,32 @@ en cache immuable un an, pages HTML jamais mises en cache, `404.html` pour les U
    ou tag `v*` (tags semver), jamais sur PR. Un tag `sha-<commit>` est toujours ajouté.
 5. **deploy** (optionnel, matrice par app) : sur `main`, si la variable de dépôt
    `DEPLOY_ENABLED=true` et les secrets `DEPLOY_HOST`, `DEPLOY_USER`, `DEPLOY_SSH_KEY`
-   existent, lance `deploy/deploy.sh <app>` sur le serveur (variable `DEPLOY_DIR`,
-   défaut `/opt/apif-salon-forum-website-demo`).
+   existent, lance `./deploy.sh <app>` sur le serveur, dans le clone de la branche
+   `deploy` (variable `DEPLOY_DIR`, défaut `/opt/apif-salon-forum-website-demo`).
 
 Authentification GHCR par le jeton éphémère du run (`GITHUB_TOKEN`, permission `packages: write`).
 
-## Déploiement sur le serveur
+## Déploiement sur le serveur (branche `deploy`)
 
-Le serveur récupère les images publiées ; aucun build n'est fait sur place. Chaque site
-se déploie indépendamment de l'autre.
+Le serveur ne clone que la branche `deploy`, qui contient uniquement `docker-compose.yml`
+(un service par site, branché sur le companion nginx-proxy + acme-companion), `.env.example`
+et `deploy.sh`. Aucun build n'est fait sur place : le serveur récupère les images publiées,
+site par site.
 
 ```bash
 # 1. Sur le serveur (une fois)
-git clone https://github.com/flavien-hugs/apif-salon-forum-website-demo.git /opt/apif-salon-forum-website-demo
+git clone -b deploy --single-branch https://github.com/flavien-hugs/apif-salon-forum-website-demo.git /opt/apif-salon-forum-website-demo
 cd /opt/apif-salon-forum-website-demo
-cp deploy/.env.example deploy/.env   # hostnames et LETSENCRYPT_EMAIL
-# si les packages GHCR sont privés : docker login ghcr.io -u <user>  (token scope read:packages)
+cp .env.example .env   # hostnames et LETSENCRYPT_EMAIL
 
 # 2. À chaque nouvelle version
-./deploy/deploy.sh salon-fintech          # ne touche pas au forum
-./deploy/deploy.sh forum-fintech v1.2.0   # une version précise
-./deploy/deploy.sh                        # les deux sites
+./deploy.sh salon-fintech          # ne touche pas au forum
+./deploy.sh forum-fintech v1.2.0   # une version précise
+./deploy.sh                        # les deux sites
 ```
 
-`deploy/docker-compose.yml` déclare un service par site, branché sur le companion
-nginx-proxy + acme-companion déjà utilisé sur le serveur (routage par `VIRTUAL_HOST`,
-certificat Let's Encrypt via `LETSENCRYPT_HOST`) et son réseau externe `nginx-proxy`.
+Le détail (prérequis, variables, déploiement automatique) est dans le README de la
+branche `deploy`.
 
 ## Écarts assumés par rapport aux maquettes
 
