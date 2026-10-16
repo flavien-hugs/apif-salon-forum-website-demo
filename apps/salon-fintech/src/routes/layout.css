@@ -1,0 +1,4 @@
+@import 'tailwindcss';
+@import '@apif/ui/theme.css';
+/* Classes utilisées par les composants du package partagé. */
+@source '../../../../packages/ui/src';

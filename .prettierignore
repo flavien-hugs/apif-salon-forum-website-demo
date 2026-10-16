@@ -1,0 +1,7 @@
+# Gestionnaires de paquets
+package-lock.json
+
+# Divers
+/apps/*/static/
+/apps/*/build/
+/apps/*/.svelte-kit/

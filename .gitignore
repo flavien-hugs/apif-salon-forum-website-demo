@@ -1,0 +1,20 @@
+node_modules
+
+# Sorties de build
+/apps/*/build
+/apps/*/.svelte-kit
+.output
+
+# OS / IDE
+.DS_Store
+Thumbs.db
+.idea/
+
+# Env
+.env
+.env.*
+!.env.example
+
+# Vite
+vite.config.js.timestamp-*
+vite.config.ts.timestamp-*

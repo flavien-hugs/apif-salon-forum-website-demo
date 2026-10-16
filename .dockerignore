@@ -1,0 +1,14 @@
+node_modules
+**/node_modules
+**/build
+**/.svelte-kit
+.git
+.github
+.vscode
+.idea
+*.md
+.env
+.env.*
+deploy
+.DS_Store
+**/vite.config.ts.timestamp-*

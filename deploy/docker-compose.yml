@@ -1,0 +1,44 @@
+# Déploiement des deux sites publics sur le serveur, chacun dans son conteneur.
+# Les images sont publiées par la CI (GitHub Actions) sur GHCR ; le serveur se
+# contente de les récupérer, site par site :
+#   ./deploy/deploy.sh salon-fintech        # ou forum-fintech, ou les deux sans argument
+# Variables : copier deploy/.env.example en deploy/.env.
+
+name: apif-sites
+
+x-site: &site
+  restart: unless-stopped
+  networks:
+    - nginx-proxy
+  logging:
+    driver: json-file
+    options:
+      max-size: '10m'
+      max-file: '3'
+
+services:
+  salon-fintech:
+    <<: *site
+    image: ${SALON_IMAGE:-ghcr.io/flavien-hugs/apif-salon-forum-website-demo/salon-fintech:latest}
+    environment:
+      # Companion nginx-proxy + acme-companion (même mécanisme que les autres
+      # sites du serveur) : routage par hostname et certificat Let's Encrypt.
+      VIRTUAL_HOST: ${SALON_HOSTNAME:-salon-fintech.bedet.ci}
+      VIRTUAL_PORT: '80'
+      LETSENCRYPT_HOST: ${SALON_HOSTNAME:-salon-fintech.bedet.ci}
+      LETSENCRYPT_EMAIL: ${LETSENCRYPT_EMAIL:-salon.fintech@bedet.ci}
+
+  forum-fintech:
+    <<: *site
+    image: ${FORUM_IMAGE:-ghcr.io/flavien-hugs/apif-salon-forum-website-demo/forum-fintech:latest}
+    environment:
+      VIRTUAL_HOST: ${FORUM_HOSTNAME:-apif.bedet.ci}
+      VIRTUAL_PORT: '80'
+      LETSENCRYPT_HOST: ${FORUM_HOSTNAME:-apif.bedet.ci}
+      LETSENCRYPT_EMAIL: ${LETSENCRYPT_EMAIL:-forum.fintech@bedet.ci}
+
+networks:
+  # Réseau du companion nginx-proxy, déclaré externe : il doit déjà exister.
+  nginx-proxy:
+    external: true
+    name: ${PROXY_NETWORK_NAME:-nginx-proxy}
