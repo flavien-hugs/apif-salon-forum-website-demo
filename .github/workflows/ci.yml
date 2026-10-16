@@ -2,7 +2,8 @@ name: CI
 
 on:
   push:
-    branches: ['**']
+    # La branche `deploy` ne contient que les fichiers du serveur : pas de CI.
+    branches: ['**', '!deploy']
     tags: ['v*']
   pull_request:
 
