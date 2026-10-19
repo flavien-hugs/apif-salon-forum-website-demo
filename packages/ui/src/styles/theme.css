@@ -923,11 +923,37 @@
 	}
 
 	/* Pied de page */
+	.site-partners {
+		margin-top: 48px;
+		background: var(--color-surface);
+		border-top: 1px solid var(--color-line);
+	}
+	.site-partners .container-site {
+		padding-block: 24px;
+	}
+	.site-partners img {
+		display: block;
+		width: 100%;
+		max-width: 1000px;
+		height: auto;
+		margin: 0 auto;
+	}
+	/* Liseré aux couleurs du drapeau, sur toute la largeur de la fenêtre */
+	.site-partners::after {
+		content: '';
+		display: block;
+		height: 5px;
+		background: linear-gradient(
+			90deg,
+			var(--color-brand-orange) 0 33.33%,
+			#fff 33.33% 66.67%,
+			var(--color-brand-green) 66.67%
+		);
+	}
 	.site-footer {
 		background: var(--color-brand-deep);
 		color: #fff;
 		padding: 40px 0 24px;
-		margin-top: 48px;
 	}
 	.site-footer a {
 		color: var(--color-on-dark-2);
@@ -1461,9 +1487,14 @@
 		.steps .step {
 			flex: 1 1 100%;
 		}
+		.site-partners {
+			margin-top: 32px;
+		}
+		.site-partners .container-site {
+			padding-block: 16px;
+		}
 		.site-footer {
 			padding: 28px 0 20px;
-			margin-top: 32px;
 		}
 		.site-footer .legal {
 			margin-top: 20px;
